@@ -6,21 +6,31 @@ function App() {
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const dateRange = `${startDate} ถึง ${endDate}`;
     const payload = { name, date: dateRange, reason };
 
+    setLoading(true);
     try {
-      await fetch('http://localhost:3001/submit-form', {
+      await fetch('https://discord-leave-backend.onrender.com/submit-form', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       setSubmitted(true);
+
+      // เคลียร์ฟอร์มหลังส่ง
+      setName('');
+      setStartDate('');
+      setEndDate('');
+      setReason('');
     } catch (error) {
       alert('❌ ส่งไม่สำเร็จ กรุณาลองใหม่');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,9 +90,10 @@ function App() {
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition disabled:opacity-50"
             >
-              ส่งฟอร์ม
+              {loading ? 'กำลังส่ง...' : 'ส่งฟอร์ม'}
             </button>
           </form>
         )}
